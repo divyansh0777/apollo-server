@@ -2,7 +2,7 @@ import { ApolloServer } from 'apollo-server-express';
 import * as express from 'express';
 import { createServer } from 'http';
 import { makeExecutableSchema } from 'graphql-tools';
-import { typeDefs } from './schema'
+import { typeDefs } from './typeDefs'
 import { resolvers } from './resolvers'
 
 const schema = makeExecutableSchema({
