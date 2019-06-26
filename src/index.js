@@ -1,26 +1,27 @@
 import { ApolloServer } from 'apollo-server-express';
+import * as BodyParser from "body-parser";
 import * as express from 'express';
 import { createServer } from 'http';
-import { makeExecutableSchema } from 'graphql-tools';
-import { typeDefs } from './typeDefs'
-import { resolvers } from './resolvers'
+import { typeDefs } from './Schema'
+import { resolvers } from './Resolvers'
 
-const schema = makeExecutableSchema({
+const server = new ApolloServer({
   typeDefs,
   resolvers,
-  context: async ({ req, connection }) => {
-    if (connection) {
-      return connection.context;
-    } else {
-      const token = req.headers.authorization || "";
-      return { token };
-    }
+  context: ({ req }) => {
+    const token = req.headers.authorization || "";
+    return { token };
   },
-});
+ });
 
-const server = new ApolloServer({ schema });
-
+const bodyParser = BodyParser;
 const app = express();
+initBodyParser;
+function initBodyParser() {
+  app.use(bodyParser.text({ type: "text/html" }));
+  app.use(bodyParser.urlencoded({ extended: false }));
+}
+
 server.applyMiddleware({app});
 
 const httpServer = createServer(app);

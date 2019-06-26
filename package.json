@@ -28,7 +28,7 @@
     "@types/graphql": "^14.2.2"
   },
   "scripts": {
-    "precompile": "rm -r ./dist || tsc --project .",
+    "presrc": "rm -r ./dist || tsc --project .",
     "src": "tsc-watch --project . --onSuccess \"npm run nodemon\"",
     "lint": "lint ./src/** --ext .js --ext .jsx",
     "nodemon": "nodemon ./dist",

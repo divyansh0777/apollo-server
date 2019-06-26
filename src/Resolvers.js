@@ -1,6 +1,7 @@
 import { PubSub } from 'apollo-server';
 import { find, filter } from 'lodash';
-import { users, roles, errorList } from './constants';
+import { users, roles, errorList } from './Constants';
+import { CheckAuthorization } from './CheckAuthorization';
 
 const pubsub = new PubSub();
 const USER_CREATED = 'USER_CREATED';
@@ -46,27 +47,33 @@ export const resolvers = {
       return temp;
     },
 
-    async deleteUser(parent, args) {
+    async deleteUser(parent, args, context) {
       const { id } = args;
+      const { token } = context;
       const foundOldUser = await find(users, { id });
       const foundOldRole = await find(roles, { id });
 
       if (!foundOldUser && !foundOldRole) throw new Error('User not found');
+      console.log('>>', CheckAuthorization);
+      const flag = await CheckAuthorization(token);
+      if (flag) {
+        await users.map(key => (
+          key.id === id
+            ? users.pop({ id })
+            : ''
+        ));
 
-      await users.map(key => (
-        key.id === id
-          ? users.pop({ id })
-          : ''
-      ));
+        await roles.map(key => (
+          key.id === id
+            ? roles.pop({ id })
+            : ''
+        ));
+        const temp = { ...foundOldUser, role: { ...foundOldRole } };
 
-      await roles.map(key => (
-        key.id === id
-          ? roles.pop({ id })
-          : ''
-      ));
-     const temp = { ...foundOldUser, role: { ...foundOldRole } };
-
-      return temp;
+        return temp;
+      } else {
+        throw new Error('User not Authenticate !');
+      }
     },
 
     async updateUser(parent, args) {
