@@ -1,4 +1,4 @@
-export function CheckAuthorization(token) {
+export default function CheckAuthorization(token) {
   if(token === 'token') {
     return true;
   } else {

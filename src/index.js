@@ -4,14 +4,27 @@ import * as express from 'express';
 import { createServer } from 'http';
 import { typeDefs } from './Schema'
 import { resolvers } from './Resolvers'
+import checkAuthorization from './CheckAuthorization';
 
 const server = new ApolloServer({
   typeDefs,
   resolvers,
-  context: ({ req }) => {
-    const token = req.headers.authorization || "";
-    return { token };
+  context: async ({ req, connection }) => {
+    if (connection) {
+      return connection.context;
+    } else {
+      const token = req.headers.authorization || "";
+      return { token };
+    }
   },
+  subscriptions: {
+    onConnect: async (connectionParams, webSocket) => {
+      if (connectionParams.authorization) {
+        return await checkAuthorization(connectionParams.authorization)
+      }
+      throw new Error('Missing auth token!');
+    }
+  }
  });
 
 const bodyParser = BodyParser;

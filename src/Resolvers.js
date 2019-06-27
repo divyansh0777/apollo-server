@@ -1,10 +1,11 @@
-import { PubSub } from 'apollo-server';
+import { PubSub, withFilter } from 'apollo-server';
 import { find, filter } from 'lodash';
 import { users, roles, errorList } from './Constants';
-import { CheckAuthorization } from './CheckAuthorization';
+import CheckAuthorization from './CheckAuthorization';
 
 const pubsub = new PubSub();
 const USER_CREATED = 'USER_CREATED';
+const USER_DELETED = 'USER_DELETED';
 
 export const resolvers = {
   Query: {
@@ -24,7 +25,7 @@ export const resolvers = {
   },
 
   Mutation: {
-    async createUser(parent, args) {
+    async createUser(parent, args, context) {
       const { id, name, role } = args;
 
       const foundUser = await find(users, { id });
@@ -53,8 +54,7 @@ export const resolvers = {
       const foundOldUser = await find(users, { id });
       const foundOldRole = await find(roles, { id });
 
-      if (!foundOldUser && !foundOldRole) throw new Error('User not found');
-      console.log('>>', CheckAuthorization);
+      if (!foundOldUser && !foundOldRole) throw new Error('Empty data received for deletion');
       const flag = await CheckAuthorization(token);
       if (flag) {
         await users.map(key => (
@@ -69,6 +69,10 @@ export const resolvers = {
             : ''
         ));
         const temp = { ...foundOldUser, role: { ...foundOldRole } };
+
+        pubsub.publish(USER_DELETED, {
+          userDeleted: temp,
+        });
 
         return temp;
       } else {
@@ -89,6 +93,10 @@ export const resolvers = {
   Subscription: {
     userCreated: {
       subscribe: () => pubsub.asyncIterator([USER_CREATED]),
+    },
+
+    userDeleted: {
+      subscribe: () => pubsub.asyncIterator([USER_DELETED]),
     },
   },
 };
