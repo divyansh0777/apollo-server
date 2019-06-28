@@ -1,4 +1,4 @@
-import { ApolloServer } from 'apollo-server-express';
+import { ApolloServer, AuthenticationError } from 'apollo-server-express';
 import * as BodyParser from "body-parser";
 import * as express from 'express';
 import { createServer } from 'http';
@@ -24,7 +24,7 @@ const server = new ApolloServer({
       }
       throw new Error('Missing auth token!');
     }
-  }
+  },
  });
 
 const bodyParser = BodyParser;

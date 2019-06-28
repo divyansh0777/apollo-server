@@ -1,4 +1,4 @@
-import { PubSub, withFilter } from 'apollo-server';
+import { PubSub, UserInputError, withFilter } from 'apollo-server';
 import { find, filter } from 'lodash';
 import { users, roles, errorList } from './Constants';
 import CheckAuthorization from './CheckAuthorization';
@@ -6,6 +6,7 @@ import CheckAuthorization from './CheckAuthorization';
 const pubsub = new PubSub();
 const USER_CREATED = 'USER_CREATED';
 const USER_DELETED = 'USER_DELETED';
+const GET_USER = 'GET_USER';
 
 export const resolvers = {
   Query: {
@@ -45,6 +46,10 @@ export const resolvers = {
         userCreated: temp,
       });
 
+      pubsub.publish(GET_USER, {
+        getUser: temp,
+      });
+
       return temp;
     },
 
@@ -54,7 +59,7 @@ export const resolvers = {
       const foundOldUser = await find(users, { id });
       const foundOldRole = await find(roles, { id });
 
-      if (!foundOldUser && !foundOldRole) throw new Error('Empty data received for deletion');
+      if (!foundOldUser && !foundOldRole) throw new UserInputError('Invalid data for deletion');
       const flag = await CheckAuthorization(token);
       if (flag) {
         await users.map(key => (
@@ -97,6 +102,15 @@ export const resolvers = {
 
     userDeleted: {
       subscribe: () => pubsub.asyncIterator([USER_DELETED]),
+    },
+
+    getUser: {
+      subscribe: withFilter(
+        () => pubsub.asyncIterator([GET_USER]),
+        (payload, variable) => {
+          return payload.getUser.id === variable.id
+        },
+      )
     },
   },
 };

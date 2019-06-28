@@ -30,10 +30,12 @@ export const typeDefs = gql`
     createUser(id: Int!, name: String!, role: String!): User!
     deleteUser(id: Int!): User!
     updateUser(id: Int!, name: String!): User!
+    getUser(id: Int!): User!
   }
 
   type Subscription {
     userCreated: User!
     userDeleted: User!
+    getUser(id: Int!): User!
   }
 `;
