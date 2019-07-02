@@ -2,40 +2,28 @@ import { gql } from 'apollo-server';
 
 export const typeDefs = gql`
   type User {
-    id: Int!
+    _id: String!
     name: String
-    role: Roles
-  }
-
-  type Roles {
-    id: Int!
     role: String
-    user: [User]
-  }
-
-  type Error {
-    errorArgs: String
-    errorField: String
+    createdAt: String
+    email: String
   }
 
   type Query {
-    user(id: Int!): [User]
-    role(role: String!): [Roles]
+    user(id: String!): [User]
     users: [User]
-    roles: [Roles]
-    getError: Error
   }
 
   type Mutation {
-    createUser(id: Int!, name: String!, role: String!): User!
-    deleteUser(id: Int!): User!
-    updateUser(id: Int!, name: String!): User!
-    getUser(id: Int!): User!
+    createUser(_id: String!, name: String!, role: String!): User!
+    deleteUser(_id: String!): User!
+    updateUser(_id: String!, name: String!): User!
+    getUser(_id: String!): User!
   }
 
   type Subscription {
     userCreated: User!
     userDeleted: User!
-    getUser(id: Int!): User!
+    getUser(_id: String!): User!
   }
 `;

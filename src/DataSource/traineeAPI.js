@@ -4,11 +4,11 @@ class trainee extends RESTDataSource{
   constructor() {
     super();
     this.baseURL = 'https://express-training.herokuapp.com';
+    console.log('Trainee');
   }
 
-  getTrainees = () => {
-    console.log('IN');
-    const response = this.get('/api/trainee/?limit=10&skip=0');
+  getTrainees = async () => {
+    const response = await this.get('/api/trainee/?limit=10&skip=0');
     return response;
   }
 }

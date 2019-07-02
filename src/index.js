@@ -5,10 +5,15 @@ import { createServer } from 'http';
 import { typeDefs } from './Schema'
 import { resolvers } from './Resolvers'
 import checkAuthorization from './CheckAuthorization';
+import { trainee, setHeaders } from './DataSource';
 
 const server = new ApolloServer({
   typeDefs,
   resolvers,
+  dataSources: () => ({
+      trainee,
+      setHeaders,
+  }),
   context: async ({ req, connection }) => {
     if (connection) {
       return connection.context;

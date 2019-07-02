@@ -1,6 +1,6 @@
 import { PubSub, UserInputError, withFilter } from 'apollo-server';
 import { find, filter } from 'lodash';
-import { users, roles, errorList } from './Constants';
+import { users } from './Constants';
 import CheckAuthorization from './CheckAuthorization';
 
 const pubsub = new PubSub();
@@ -10,37 +10,21 @@ const GET_USER = 'GET_USER';
 
 export const resolvers = {
   Query: {
-    getError: () => errorList,
-    user: (obj, args) => filter(users, { id: args.id }),
-    role: (obj, args) => filter(roles, { role: args.role }),
+    user: (obj, args) => filter(users, { _id: args._id }),
     users: () => users,
-    roles: () => roles,
-  },
-
-  User: {
-    role: parent => find(roles, { id: parent.id }),
-  },
-
-  Roles: {
-    user: parent => filter(users, { id: parent.id }),
   },
 
   Mutation: {
     async createUser(parent, args, context) {
-      const { id, name, role } = args;
+      const { _id, name, role } = args;
 
-      const foundUser = await find(users, { id });
+      const foundUser = await find(users, { _id });
       if (foundUser) throw new Error('User already Exist');
-      await users.push({ id, name });
+      await users.push({ _id, name });
 
-      const foundRole = await find(roles, { id });
-      if (foundRole) throw new Error('User created but role already exists for this user');
-      await roles.push({ id, role });
+      const foundNewUser = await find(users, { _id });
 
-      const foundNewUser = await find(users, { id });
-      const foundNewRole = await find(roles, { id });
-
-      const temp = { ...foundNewUser, role: { ...foundNewRole } };
+      const temp = { ...foundNewUser };
 
       pubsub.publish(USER_CREATED, {
         userCreated: temp,
@@ -54,26 +38,20 @@ export const resolvers = {
     },
 
     async deleteUser(parent, args, context) {
-      const { id } = args;
+      const { _id } = args;
       const { token } = context;
-      const foundOldUser = await find(users, { id });
-      const foundOldRole = await find(roles, { id });
+      const foundOldUser = await find(users, { _id });
 
-      if (!foundOldUser && !foundOldRole) throw new UserInputError('Invalid data for deletion');
+      if (!foundOldUser) throw new UserInputError('Invalid data for deletion');
       const flag = await CheckAuthorization(token);
       if (flag) {
         await users.map(key => (
-          key.id === id
-            ? users.pop({ id })
+          key._id === _id
+            ? users.pop({ _id })
             : ''
         ));
 
-        await roles.map(key => (
-          key.id === id
-            ? roles.pop({ id })
-            : ''
-        ));
-        const temp = { ...foundOldUser, role: { ...foundOldRole } };
+        const temp = { ...foundOldUser };
 
         pubsub.publish(USER_DELETED, {
           userDeleted: temp,
@@ -86,10 +64,10 @@ export const resolvers = {
     },
 
     async updateUser(parent, args) {
-      const { id, name } = args;
-      const foundUser = await find(users, { id });
+      const { _id, name } = args;
+      const foundUser = await find(users, { _id });
       if (!foundUser) throw new Error('User does not Exist');
-      foundUser.id = id;
+      foundUser._id = _id;
       foundUser.name = name;
       return foundUser;
     },
@@ -108,7 +86,7 @@ export const resolvers = {
       subscribe: withFilter(
         () => pubsub.asyncIterator([GET_USER]),
         (payload, variable) => {
-          return payload.getUser.id === variable.id
+          return payload.getUser._id === variable._id
         },
       )
     },
