@@ -28,6 +28,9 @@ const server = new ApolloServer({
         return await checkAuthorization(connectionParams.authorization)
       }
       throw new Error('Missing auth token!');
+    },
+    onDisconnect: () => {
+      console.log('disconnect...');
     }
   },
  });
