@@ -16,11 +16,11 @@ export const resolvers = {
 
   Mutation: {
     async createUser(parent, args, context) {
-      const { _id, name, role } = args;
+      const { _id, name, role, email, createdAt } = args;
 
       const foundUser = await find(users, { _id });
       if (foundUser) throw new Error('User already Exist');
-      await users.push({ _id, name });
+      await users.push({ _id, name, role, email, createdAt });
 
       const foundNewUser = await find(users, { _id });
 

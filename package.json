@@ -32,7 +32,7 @@
     "@types/graphql": "^14.2.2"
   },
   "scripts": {
-    "presrc": "rm -r ./dist || tsc --project .",
+    "presrc": "rm -r ./dist && kill-port 4000 || tsc --project .",
     "src": "tsc-watch --project . --onSuccess \"npm run nodemon\"",
     "lint": "lint ./src/** --ext .js --ext .jsx",
     "nodemon": "nodemon ./dist",

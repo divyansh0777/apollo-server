@@ -4,9 +4,9 @@ export const typeDefs = gql`
   type User {
     _id: String!
     name: String
+    email: String
     role: String
     createdAt: String
-    email: String
   }
 
   type Query {
@@ -15,7 +15,7 @@ export const typeDefs = gql`
   }
 
   type Mutation {
-    createUser(_id: String!, name: String!, role: String!): User!
+    createUser(_id: String!, name: String!, role: String!, email: String!, createdAt: String!): User!
     deleteUser(_id: String!): User!
     updateUser(_id: String!, name: String!): User!
     getUser(_id: String!): User!
