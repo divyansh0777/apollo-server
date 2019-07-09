@@ -10,8 +10,14 @@ const GET_USER = 'GET_USER';
 
 export const resolvers = {
   Query: {
-    user: (obj, args) => filter(users, { _id: args._id }),
-    users: () => users,
+    user: (obj, args) => {filter(users, { _id: args._id })},
+    // users: () => users,
+    users: async (obj, args, context) => {
+      const { dataSources } = context;
+      const { limit, skip } = args;
+      const response = await dataSources.trainee.getTrainees(limit, skip);
+      return response.data.records;
+    },
   },
 
   Mutation: {

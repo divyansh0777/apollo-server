@@ -5,27 +5,22 @@ import { createServer } from 'http';
 import { typeDefs } from './Schema'
 import { resolvers } from './Resolvers'
 import checkAuthorization from './CheckAuthorization';
-import { trainee, setHeaders } from './DataSource';
+import { trainee } from './DataSource';
 
 const server = new ApolloServer({
   typeDefs,
   resolvers,
   dataSources: () => ({
       trainee,
-      setHeaders,
   }),
-  context: async ({ req, connection }) => {
-    if (connection) {
-      return connection.context;
-    } else {
-      const token = req.headers.authorization || "";
-      return { token };
-    }
+  context: ({ req }) => {
+    const token = req.headers.token;
+    return { token };
   },
   subscriptions: {
     onConnect: async (connectionParams, webSocket) => {
-      if (connectionParams.authorization) {
-        return await checkAuthorization(connectionParams.authorization)
+      if (connectionParams.token) {
+        return await checkAuthorization(connectionParams.token)
       }
       throw new Error('Missing auth token!');
     },
