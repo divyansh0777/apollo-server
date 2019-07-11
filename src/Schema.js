@@ -25,6 +25,7 @@ export const typeDefs = gql`
   type Subscription {
     userCreated: User!
     userDeleted: User!
+    userUpdated: User!
     getUser(_id: String!): User!
   }
 `;

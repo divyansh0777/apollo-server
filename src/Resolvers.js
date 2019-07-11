@@ -6,11 +6,12 @@ import CheckAuthorization from './CheckAuthorization';
 const pubsub = new PubSub();
 const USER_CREATED = 'USER_CREATED';
 const USER_DELETED = 'USER_DELETED';
+const USER_UPDATED = 'USER_UPDATED';
 const GET_USER = 'GET_USER';
 
 export const resolvers = {
   Query: {
-    user: (obj, args) => {filter(users, { _id: args._id })},
+    user: (obj, args) => filter(users, { _id: args._id }),
     users: () => users,
     // users: async (obj, args, context) => {
       // const { dataSources } = context;
@@ -74,7 +75,14 @@ export const resolvers = {
       if (!foundUser) throw new Error('User does not Exist');
       foundUser._id = _id;
       foundUser.name = name;
-      return foundUser;
+
+      const temp = { ...foundUser };
+
+      pubsub.publish(USER_UPDATED, {
+        userUpdated: temp,
+      });
+
+      return temp;
     },
   },
 
@@ -85,6 +93,10 @@ export const resolvers = {
 
     userDeleted: {
       subscribe: () => pubsub.asyncIterator([USER_DELETED]),
+    },
+
+    userUpdated: {
+      subscribe: () => pubsub.asyncIterator([USER_UPDATED]),
     },
 
     getUser: {
