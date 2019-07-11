@@ -10,12 +10,16 @@ import { trainee } from './DataSource';
 const server = new ApolloServer({
   typeDefs,
   resolvers,
-  dataSources: () => ({
-      trainee,
-  }),
-  context: ({ req }) => {
-    const token = req.headers.token;
-    return { token };
+  // dataSources: () => ({
+  //     trainee,
+  // }),
+  context: ({ req, connection }) => {
+    if(connection) {
+      return connection.context;
+    } else {
+      const token = req.headers.token;
+      return { token };
+    }
   },
   subscriptions: {
     onConnect: async (connectionParams, webSocket) => {
@@ -43,4 +47,6 @@ server.applyMiddleware({app});
 const httpServer = createServer(app);
 server.installSubscriptionHandlers(httpServer);
 
-httpServer.listen({port: 4000});
+httpServer.listen({port: 4000}, () => {
+  console.log('🚀 Server ready at http://localhost:4000/');
+});

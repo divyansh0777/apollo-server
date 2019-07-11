@@ -16,6 +16,7 @@
     "babel-loader": "^8.0.6",
     "eslint-config-airbnb": "^17.1.0",
     "express": "^4.17.1",
+    "express-graphql": "^0.8.0",
     "graphql": "^14.3.1",
     "graphql-tag": "^2.10.1",
     "graphql-tools": "^4.0.5",
@@ -34,7 +35,7 @@
     "@types/graphql": "^14.2.2"
   },
   "scripts": {
-    "prestart": "rm -r ./dist && kill-port 4000 || tsc --project .",
+    "prestart": "kill-port 4000&&rm -r ./dist || tsc --project .",
     "kill": "kill-port 4000",
     "start": "tsc-watch --project . --onSuccess \"npm run nodemon\"",
     "lint": "lint ./src/** --ext .js --ext .jsx",

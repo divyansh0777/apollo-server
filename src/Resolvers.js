@@ -11,19 +11,18 @@ const GET_USER = 'GET_USER';
 export const resolvers = {
   Query: {
     user: (obj, args) => {filter(users, { _id: args._id })},
-    // users: () => users,
-    users: async (obj, args, context) => {
-      const { dataSources } = context;
-      const { limit, skip } = args;
-      const response = await dataSources.trainee.getTrainees(limit, skip);
-      return response.data.records;
-    },
+    users: () => users,
+    // users: async (obj, args, context) => {
+      // const { dataSources } = context;
+      // const { limit, skip } = args;
+      // const response = await dataSources.trainee.getTrainees(limit, skip);
+      // return response.data.records;
+    // },
   },
 
   Mutation: {
-    async createUser(parent, args, context) {
+    async createUser(parent, args) {
       const { _id, name, role, email, createdAt } = args;
-
       const foundUser = await find(users, { _id });
       if (foundUser) throw new Error('User already Exist');
       await users.push({ _id, name, role, email, createdAt });

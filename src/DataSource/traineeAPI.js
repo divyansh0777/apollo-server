@@ -4,7 +4,6 @@ class trainee extends RESTDataSource{
   constructor() {
     super();
     this.baseURL = 'https://express-training.herokuapp.com';
-    console.log('Trainee');
   }
 
   willSendRequest(request) {
