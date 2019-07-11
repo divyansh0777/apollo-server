@@ -10,9 +10,9 @@ import { trainee } from './DataSource';
 const server = new ApolloServer({
   typeDefs,
   resolvers,
-  // dataSources: () => ({
-  //     trainee,
-  // }),
+  dataSources: () => ({
+      trainee,
+  }),
   context: ({ req, connection }) => {
     if(connection) {
       return connection.context;
