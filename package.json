@@ -1,0 +1,53 @@
+{
+  "name": "apollo",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {
+    "@babel/cli": "^7.4.4",
+    "@babel/core": "^7.4.5",
+    "@babel/node": "^7.4.5",
+    "@babel/preset-env": "^7.4.5",
+    "apollo-client": "^2.6.3",
+    "apollo-datasource-rest": "^0.5.0",
+    "apollo-server": "^2.6.4",
+    "apollo-server-express": "^2.6.4",
+    "axios": "^0.19.0",
+    "babel-loader": "^8.0.6",
+    "eslint-config-airbnb": "^17.1.0",
+    "express": "^4.17.1",
+    "express-graphql": "^0.8.0",
+    "graphql": "^14.3.1",
+    "graphql-tag": "^2.10.1",
+    "graphql-tools": "^4.0.5",
+    "http": "^0.0.0",
+    "husky": "^2.5.0",
+    "lint": "^0.7.0",
+    "lodash": "^4.17.11",
+    "node": "^12.4.0",
+    "node-fetch": "^2.6.0",
+    "nodemon": "^1.19.1",
+    "react-apollo": "^2.5.8",
+    "tsc-watch": "^2.2.1",
+    "typescript": "^3.5.2"
+  },
+  "devDependencies": {
+    "@types/graphql": "^14.2.2"
+  },
+  "scripts": {
+    "prestart": "kill-port 4000&&rm -r ./dist || tsc --project .",
+    "kill": "kill-port 4000",
+    "start": "tsc-watch --project . --onSuccess \"npm run nodemon\"",
+    "lint": "lint ./src/** --ext .js --ext .jsx",
+    "nodemon": "nodemon ./dist",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Divyansh Mishra",
+  "license": "ISC",
+  "husky": {
+    "hooks": {
+      "pre-push": "npm run compile",
+      "pre-commit": "npm run lint"
+    }
+  }
+}
